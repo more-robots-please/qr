@@ -38,7 +38,6 @@ struct PngQuery {
 
 #[derive(Clone)]
 struct AppState {
-    base_url: String,
     shortener_url: String,
     logo_b64: String,
 }
@@ -50,7 +49,6 @@ async fn main() {
     dotenv().ok();
     tracing_subscriber::fmt::init();
 
-    let base_url = env::var("BASE_URL").expect("BASE_URL must be set");
     let shortener_url = env::var("SHORTENER_URL").expect("SHORTENER_URL must be set");
 
     // Load favicon as base64 for logo embedding
@@ -58,8 +56,8 @@ async fn main() {
         .map(|bytes| general_purpose::STANDARD.encode(&bytes))
         .unwrap_or_default();
 
-    let state = AppState { base_url, shortener_url, logo_b64 };
-
+    let state = AppState { shortener_url, logo_b64 };
+    
     let app = Router::new()
         .route("/", get(index))
         .route("/api/generate", post(generate))
