@@ -99,10 +99,6 @@ async fn index(
       <div class="controls">
         <input type="url" id="url" placeholder="https://example.com" autocomplete="off" />
         <div class="toggle-row">
-          <input type="checkbox" id="logo" />
-          <label for="logo">embed seraph logo</label>
-        </div>
-        <div class="toggle-row">
           <input type="checkbox" id="print-mode" />
           <label for="print-mode">print mode (black on white)</label>
         </div>
