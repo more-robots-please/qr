@@ -1,6 +1,6 @@
 use axum::{
     extract::Query,
-    http::{header, StatusCode},
+    http::{header, Method, StatusCode},
     response::{Html, IntoResponse, Response},
     routing::{get, post},
     Json, Router,
@@ -11,7 +11,7 @@ use image::{ImageBuffer, Rgb};
 use qrcode::{EcLevel, QrCode};
 use serde::{Deserialize, Serialize};
 use std::env;
-use tower_http::services::ServeDir;
+use tower_http::{cors::{Any, CorsLayer}, services::ServeDir};
 
 // ── Request/response types ───────────────────────────────────────────
 
@@ -63,6 +63,10 @@ async fn main() {
         .route("/api/generate", post(generate))
         .route("/api/png", get(generate_png))
         .nest_service("/static", ServeDir::new("static"))
+        .layer(CorsLayer::new()
+            .allow_origin(Any)
+            .allow_methods([Method::GET, Method::POST])
+            .allow_headers(Any))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
