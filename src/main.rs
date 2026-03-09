@@ -52,7 +52,7 @@ async fn main() {
     let shortener_url = env::var("SHORTENER_URL").expect("SHORTENER_URL must be set");
 
     // Load favicon as base64 for logo embedding
-    let logo_b64 = std::fs::read("/var/www/seraph.ws/favicon.png")
+    let logo_b64 = std::fs::read("static/qr-favicon.png")
         .map(|bytes| general_purpose::STANDARD.encode(&bytes))
         .unwrap_or_default();
 
@@ -238,7 +238,7 @@ fn build_png(url: &str, logo: bool, print_mode: bool, logo_b64: &str) -> Result<
     let matrix = code.to_colors();
     let width = code.width();
     let quiet = 4usize;
-    let cell = 20usize;
+    let cell = 40usize;
     let size = ((width + quiet * 2) * cell) as u32;
 
     let mut img = ImageBuffer::from_pixel(size, size, bg_color);

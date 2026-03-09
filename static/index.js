@@ -1,9 +1,7 @@
 let debounceTimer = null;
 let currentSvg = null;
-let currentPngUrl = null;
 
 const urlInput = document.getElementById('url');
-const logoToggle = document.getElementById('logo');
 const printToggle = document.getElementById('print-mode');
 const container = document.getElementById('qr-container');
 const modeLabel = document.getElementById('mode-label');
@@ -26,8 +24,6 @@ async function generate() {
   }
 
   const print = printToggle.checked;
-  const logo = logoToggle.checked;
-
   container.innerHTML = '<span>generating...</span>';
   dlPng.disabled = true;
   dlSvg.disabled = true;
@@ -35,7 +31,7 @@ async function generate() {
   const res = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ url, logo, print_mode: print })
+    body: JSON.stringify({ url, logo: true, print_mode: print })
   });
 
   if (!res.ok) {
@@ -45,11 +41,9 @@ async function generate() {
 
   const data = await res.json();
   currentSvg = data.svg;
-  currentPngUrl = `/api/png?url=${encodeURIComponent(url)}&logo=${logo}&print_mode=${print}`;
 
   const blob = new Blob([currentSvg], { type: 'image/svg+xml' });
-  const objUrl = URL.createObjectURL(blob);
-  container.innerHTML = `<img src="${objUrl}" alt="QR code" />`;
+  container.innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="QR code" />`;
   modeLabel.textContent = print ? 'print mode — black on white' : 'screen mode — pink on black';
 
   dlPng.disabled = false;
@@ -60,8 +54,7 @@ async function downloadPng() {
   const url = urlInput.value.trim();
   if (!url) return;
   const print = printToggle.checked;
-  const logo = logoToggle.checked;
-  const res = await fetch(`/api/png?url=${encodeURIComponent(url)}&logo=${logo}&print_mode=${print}`);
+  const res = await fetch(`/api/png?url=${encodeURIComponent(url)}&logo=true&print_mode=${print}`);
   const blob = await res.blob();
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -79,10 +72,8 @@ function downloadSvg() {
 }
 
 urlInput.addEventListener('input', onInput);
-logoToggle.addEventListener('change', generate);
 printToggle.addEventListener('change', generate);
 
-// Auto-generate if URL param provided
 const params = new URLSearchParams(window.location.search);
 if (params.get('url')) {
   urlInput.value = params.get('url');
